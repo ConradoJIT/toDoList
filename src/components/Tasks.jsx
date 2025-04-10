@@ -15,31 +15,37 @@ function Tasks({ tasks, onTaskClick, onDeleteTaskClick }) {
 
   return (
     <ul className="space-y-4 p-6 bg-slate-200 rounded-md shadow overflow-auto">
-      {tasks.map((task) => (
-        <li key={task.id} className="flex gap-2">
-          <button
-            onClick={() => onTaskClick(task.id)}
-            className="bg-slate-400 text-left text-white p-2 rounded-md w-full break-words overflow-auto"
-          >
-            {task.isCompleted ? "✅" : ""}
-            {task.title}
-            <p className="text-slate-300">Prazo: {task.deadline}</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => onSeeDetailsClick(task)}
-            className="bg-slate-400 text-white p-2 rounded-md"
-          >
-            <ChevronRightIcon></ChevronRightIcon>
-          </button>
-          <button
-            onClick={() => onDeleteTaskClick(task.id)}
-            className="bg-slate-400 text-white p-2 rounded-md"
-          >
-            <DeleteIcon></DeleteIcon>
-          </button>
+      {tasks.length > 0 ? (
+        tasks.map((task) => (
+          <li key={task.id} className="flex gap-2">
+            <button
+              onClick={() => onTaskClick(task.id)}
+              className="bg-slate-400 text-left text-white p-2 rounded-md w-full break-words overflow-auto"
+            >
+              {task.isCompleted ? "✅" : ""}
+              {task.title}
+              <p className="text-slate-300">Prazo: {task.deadline}</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => onSeeDetailsClick(task)}
+              className="bg-slate-400 text-white p-2 rounded-md"
+            >
+              <ChevronRightIcon></ChevronRightIcon>
+            </button>
+            <button
+              onClick={() => onDeleteTaskClick(task.id)}
+              className="bg-slate-400 text-white p-2 rounded-md"
+            >
+              <DeleteIcon></DeleteIcon>
+            </button>
+          </li>
+        ))
+      ) : (
+        <li className="text-1xl text-slate-500 font-bold text-center">
+          Não há tarefas aqui
         </li>
-      ))}
+      )}
     </ul>
   );
 }

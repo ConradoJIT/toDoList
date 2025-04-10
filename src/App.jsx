@@ -51,32 +51,36 @@ function App() {
   }
 
   return (
-    <div className="w-screen h-screen bg-slate-500 flex items-center justify-center p-6">
+    <div className="h-screen w-screen bg-slate-500 flex items-center justify-center p-6">
       <div className="w-[800px] space-y-4">
         <h1 className="text-3xl text-slate-100 font-bold text-center">
           Gerenciador de Tarefas
         </h1>
         <AddTask onAddTaskSubmit={onAddTaskSubmit} />
         <div className="flex gap-4 justify-center">
-          <div className="w-[50%] min-h-[300px]">
+          <div className="w-[50%] min-h-[300px] ">
             <p className="text-2xl text-slate-100 font-bold text-center">
               A fazer
             </p>
-            <Tasks
-              tasks={tasks.filter((task) => !task.isCompleted)}
-              onTaskClick={onTaskClick}
-              onDeleteTaskClick={onDeleteTaskClick}
-            />
+            <div className="max-h-[500px] overflow-y-auto">
+              <Tasks
+                tasks={tasks.filter((task) => !task.isCompleted)}
+                onTaskClick={onTaskClick}
+                onDeleteTaskClick={onDeleteTaskClick}
+              />
+            </div>
           </div>
           <div className="w-[50%] min-h-[300px]">
             <p className="text-2xl text-slate-100 font-bold text-center">
               Concluidas
             </p>
-            <Tasks
-              tasks={tasks.filter((task) => task.isCompleted)}
-              onTaskClick={onTaskClick}
-              onDeleteTaskClick={onDeleteTaskClick}
-            />
+            <div className="max-h-[500px] overflow-y-auto">
+              <Tasks
+                tasks={tasks.filter((task) => task.isCompleted)}
+                onTaskClick={onTaskClick}
+                onDeleteTaskClick={onDeleteTaskClick}
+              />
+            </div>
           </div>
         </div>
       </div>
