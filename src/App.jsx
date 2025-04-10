@@ -12,16 +12,16 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  useEffect(() => {
-    async function fetchTasks() {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/todos?_limit=10"
-      );
-      const data = await response.json();
-      setTasks(data);
-    }
-    fetchTasks();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchTasks() {
+  //     const response = await fetch(
+  //       "https://jsonplaceholder.typicode.com/todos?_limit=10"
+  //     );
+  //     const data = await response.json();
+  //     setTasks(data);
+  //   }
+  //   fetchTasks();
+  // }, []);
 
   function onTaskClick(taskId) {
     const newTasks = tasks.map((task) => {
@@ -55,11 +55,28 @@ function App() {
           Gerenciador de Tarefas
         </h1>
         <AddTask onAddTaskSubmit={onAddTaskSubmit} />
-        <Tasks
-          tasks={tasks}
-          onTaskClick={onTaskClick}
-          onDeleteTaskClick={onDeleteTaskClick}
-        />
+        <div className="flex gap-4 justify-center">
+          <div>
+            <p className="text-2xl text-slate-100 font-bold text-center">
+              A fazer
+            </p>
+            <Tasks
+              tasks={tasks.filter((task) => !task.isCompleted)}
+              onTaskClick={onTaskClick}
+              onDeleteTaskClick={onDeleteTaskClick}
+            />
+          </div>
+          <div>
+            <p className="text-2xl text-slate-100 font-bold text-center">
+              Concluidas
+            </p>
+            <Tasks
+              tasks={tasks.filter((task) => task.isCompleted)}
+              onTaskClick={onTaskClick}
+              onDeleteTaskClick={onDeleteTaskClick}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
