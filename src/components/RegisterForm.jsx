@@ -56,6 +56,7 @@ function RegisterForm() {
           emailErro ? "border-red-500" : "border-slate-400"
         }`}
         value={email}
+        required
         onChange={(e) => setEmail(e.target.value)}
         onInvalid={(e) => {
           e.preventDefault();
