@@ -14,17 +14,16 @@ function Tasks({ tasks, onTaskClick, onDeleteTaskClick }) {
   }
 
   return (
-    <ul className="space-y-4 p-6 bg-slate-200 rounded-md shadow">
+    <ul className="space-y-4 p-6 bg-slate-200 rounded-md shadow overflow-auto">
       {tasks.map((task) => (
         <li key={task.id} className="flex gap-2">
           <button
             onClick={() => onTaskClick(task.id)}
-            className={`bg-slate-400 text-left text-white p-2 rounded-md w-full ${
-              task.isCompleted && "line-through"
-            }`}
+            className="bg-slate-400 text-left text-white p-2 rounded-md w-full break-words overflow-auto"
           >
-            {task.isCompleted ? "✅" : "❌"}
+            {task.isCompleted ? "✅" : ""}
             {task.title}
+            <p className="text-slate-300">Prazo: {task.deadline}</p>
           </button>
           <button
             type="button"
