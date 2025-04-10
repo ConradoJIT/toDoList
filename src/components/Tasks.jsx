@@ -23,8 +23,8 @@ function Tasks({ tasks, onTaskClick, onDeleteTaskClick }) {
               task.isCompleted && "line-through"
             }`}
           >
+            {task.isCompleted ? "✅" : "❌"}
             {task.title}
-            {/* {task.isCompleted ? "Complete" : "Incomplete"} */}
           </button>
           <button
             type="button"
