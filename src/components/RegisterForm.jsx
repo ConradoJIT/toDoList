@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
 
 function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -31,68 +32,112 @@ function RegisterForm() {
     }
 
     if (valido) {
-      console.log("Formulário válido:", { nome, email, senha });
+      const user = {
+        nome,
+        email,
+        senha,
+        id: v4(),
+      };
+
+      const saveUsers = localStorage.getItem("users");
+
+      const usersList = saveUsers ? JSON.parse(saveUsers) : [];
+
+      usersList.push(user);
+
+      localStorage.setItem("users", JSON.stringify(usersList));
+
+      console.log("Usuário salvo:", user);
       navigate("/");
+      setNome("");
+      setEmail("");
+      setSenha("");
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 p-6 bg-slate-200 rounded-md shadow flex flex-col"
-    >
-      <input
-        type="text"
-        placeholder="Digite o nome"
-        className="border border-slate-400 outline-slate-400 px-4 py-2 rounded-md"
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
-      />
-      {nomeErro && <p className="text-red-500 text-sm">{nomeErro}</p>}
-      <input
-        type="email"
-        placeholder="Digite o email"
-        className={`border px-4 py-2 rounded-md ${
-          emailErro ? "border-red-500" : "border-slate-400"
-        }`}
-        value={email}
-        required
-        onChange={(e) => setEmail(e.target.value)}
-        onInvalid={(e) => {
-          e.preventDefault();
-          setEmailErro("Por favor, insira um email válido.");
-        }}
-        onInput={() => setEmailErro("")}
-      />
-      {emailErro && <p className="text-red-500 text-sm">{emailErro}</p>}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
+      <h1 className="text-2xl font-bold text-center mb-2">Registre-se</h1>
 
-      <input
-        type="password"
-        placeholder="Digite a senha"
-        className={`border px-4 py-2 rounded-md ${
-          senhaErro ? "border-red-500" : "border-slate-400"
-        }`}
-        value={senha}
-        onChange={(e) => setSenha(e.target.value)}
-      />
-      {senhaErro && <p className="text-red-500 text-sm">{senhaErro}</p>}
+      <div className="flex flex-col">
+        <label htmlFor="nome" className="text-sm mb-1">
+          Nome
+        </label>
+        <input
+          id="nome"
+          type="text"
+          placeholder="Digite seu nome"
+          className="border border-slate-400 outline-slate-400 px-4 py-2 rounded-md"
+          value={nome}
+          onChange={(e) => {
+            setNome(e.target.value);
+            setNomeErro("");
+          }}
+        />
+        {nomeErro && <p className="text-red-500 text-sm">{nomeErro}</p>}
+      </div>
 
-      <button
-        className="text-sm text-slate-500 font-bold text-right"
-        onClick={() => navigate("/")} //ALTERAR PARA A ROTA DE LOGIN
-        type="button"
-      >
-        Ja possui cadastro? Clique aqui para logar
-      </button>
+      <div className="flex flex-col">
+        <label htmlFor="email" className="text-sm mb-1">
+          E-mail
+        </label>
+        <input
+          id="email"
+          type="email"
+          placeholder="Digite seu e-mail"
+          className={`border px-4 py-2 rounded-md ${
+            emailErro ? "border-red-500" : "border-slate-400"
+          }`}
+          value={email}
+          required
+          onChange={(e) => setEmail(e.target.value)}
+          onInvalid={(e) => {
+            e.preventDefault();
+            setEmailErro("Por favor, insira um email válido.");
+          }}
+          onInput={() => setEmailErro("")}
+        />
+        {emailErro && <p className="text-red-500 text-sm">{emailErro}</p>}
+      </div>
+
+      <div className="flex flex-col">
+        <label htmlFor="senha" className="text-sm mb-1">
+          Senha
+        </label>
+        <input
+          id="senha"
+          type="password"
+          placeholder="Digite sua senha"
+          className={`border px-4 py-2 rounded-md ${
+            senhaErro ? "border-red-500" : "border-slate-400"
+          }`}
+          value={senha}
+          onChange={(e) => {
+            setSenha(e.target.value);
+            setSenhaErro("");
+          }}
+        />
+        {senhaErro && <p className="text-red-500 text-sm">{senhaErro}</p>}
+      </div>
+
+      <p className="text-sm text-center mt-2">
+        Já possui cadastro?{" "}
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="text-stone-700 font-semibold hover:underline"
+        >
+          Clique aqui para logar
+        </button>
+      </p>
 
       <button
         type="submit"
-        className="bg-slate-500 text-white px-4 py-2 rounded-md hover:bg-slate-600"
+        className="bg-stone-600 text-white py-2 rounded hover:bg-stone-700 transition-colors"
       >
         Registrar
       </button>
     </form>
   );
 }
-
 export default RegisterForm;
