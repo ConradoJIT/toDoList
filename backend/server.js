@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -6,7 +5,6 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 5000;
-//const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/todoDB';
 const saltRounds = 10; //o número de vezes que o algoritmo de criptografia será aplicado sobre a senha
 
 /*
@@ -19,7 +17,6 @@ são salvas no banco de dados.
 app.use(cors());
 app.use(express.json());
 
-//mongoose.connect(DB_URI);//, {useNewURLParser:true,useUnifiedTopology:true});
 mongoose.connect('mongodb://localhost:27017/todoDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -141,12 +138,12 @@ app.put('/Tarefas/:id', async (req,res)=>{
         //if (req.body.prioriedade){
         //    tarefa.priority = req.body.priority;
         //}
-        if (req.params.isCompleted !== undefined)
+        if (req.body.isCompleted !== undefined)
         {
             tarefa.isCompleted = req.body.isCompleted;        
         }
-        await usuario.save();
-        res.json(usuario);
+        await tarefa.save();
+        res.json(tarefa);
     }
     catch(error)
     {
