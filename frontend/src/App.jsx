@@ -21,19 +21,24 @@ function App() {
   },[]);
 
 
-  function onTaskClick(taskId) {
-    const newTasks = tasks.map((task) => {
-      if (task.id == taskId) {
-        return { ...task, isCompleted: !task.isCompleted };
+  async function onTaskClick(taskId) {
+    const updatedTasks = tasks.map((task) =>
+    {
+      if (task.id === taskId)
+      {
+        const updatedTask =  { ...task, isCompleted: !task.isCompleted };
+        updateTodo(taskId, {isCompleted:updatedTask.isCompleted});//atualização no back
+        return updatedTask;
       }
       return task;
     });
-    setTasks(newTasks);
+    setTasks(updatedTasks);
   }
 
   function onDeleteTaskClick(taskId) {
     const newTasks = tasks.filter((task) => task.id !== taskId);
     setTasks(newTasks);
+    deleteTask(taskId);
   }
 
   function onAddTaskSubmit(title, description, deadline) {
@@ -45,7 +50,8 @@ function App() {
 
   const pegarTarefas = async () => {
     const response = await axios.get(`${enderecoBD}/Tarefas`) //endereço do banco de 
-    setTasks(response.data);
+    const tasksWithNormalId = response.data.map(_task => ({... _task, id:_task._id})); //quando eu pego do banco o "id" se chama "_id", eu tenha eu tenho que mudar o nome desse atributo
+    setTasks(tasksWithNormalId);
   }
 
   const addTarefa = async (title, description, deadline) => {
@@ -56,7 +62,8 @@ function App() {
         deadline,
         isCompleted: false
       });
-      setTasks([...tasks, response.data]);
+      const taskWithNormalId = {...response.data, id:response.data._id};//normalização do id
+      setTasks([...tasks, taskWithNormalId]);
     } catch (error) {
       console.error("Erro ao adicionar tarefa:", error);
     }
@@ -65,7 +72,7 @@ function App() {
   const updateTodo = async (id, atributosAtualizacao) =>{
     try
     {
-      await axios.patch(`${enderecoBD}/Tarefas/${id}`, atributosAtualizacao);
+      await axios.put(`${enderecoBD}/Tarefas/${id}`, atributosAtualizacao);
     }
     catch (error)
     {
