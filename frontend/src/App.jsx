@@ -2,26 +2,24 @@ import { useEffect, useState } from "react";
 import AddTask from "./components/AddTask";
 import Tasks from "./components/Tasks";
 import { v4 } from "uuid";
+import axios from 'axios';//biblioteca para comunicar o front com o back
 
 function App() {
-  const [tasks, setTasks] = useState(
-    JSON.parse(localStorage.getItem("tasks")) || []
-  );
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    deadline: ''
+    //priority: undefined
+    //email_user: undefined,
+  });
 
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  //pegar do banco
+  useEffect(()=>
+  {
+    pegarTarefas();
+  },[]);
 
-  // useEffect(() => {
-  //   async function fetchTasks() {
-  //     const response = await fetch(
-  //       "https://jsonplaceholder.typicode.com/todos?_limit=10"
-  //     );
-  //     const data = await response.json();
-  //     setTasks(data);
-  //   }
-  //   fetchTasks();
-  // }, []);
 
   function onTaskClick(taskId) {
     const newTasks = tasks.map((task) => {
@@ -39,16 +37,48 @@ function App() {
   }
 
   function onAddTaskSubmit(title, description, deadline) {
-    const newTask = {
-      id: v4(),
-      title,
-      description,
-      deadline,
-      isCompleted: false,
-    };
-    setTasks([...tasks, newTask]);
-    console.log(newTask);
+    addTarefa(title, description, deadline);
   }
+    
+  //comunicação com o backend
+  const enderecoBD = 'http://localhost:5000'
+
+  const pegarTarefas = async () => {
+    const response = await axios.get(`${enderecoBD}/Tarefas`) //endereço do banco de 
+    setTasks(response.data);
+  }
+
+  const addTarefa = async (title, description, deadline) => {
+    try {
+      const response = await axios.post(`${enderecoBD}/Tarefas`, {
+        title,
+        description,
+        deadline,
+        isCompleted: false
+      });
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      console.error("Erro ao adicionar tarefa:", error);
+    }
+  };
+  
+  const updateTodo = async (id, atributosAtualizacao) =>{
+    try
+    {
+      await axios.patch(`${enderecoBD}/Tarefas/${id}`, atributosAtualizacao);
+    }
+    catch (error)
+    {
+      console.error("Falha ao atualizar:", error);
+    }
+  };
+
+  const deleteTask = async(id) => {
+    await axios.delete(`${enderecoBD}/Tarefas/${id}`);
+    pegarTarefas(); //atualização da lista
+  };
+
+  //fim da comunicação com o backend
 
   return (
     <div className="h-screen w-screen bg-slate-500 flex items-center justify-center p-6">
