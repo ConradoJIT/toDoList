@@ -20,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 //mongoose.connect(DB_URI);//, {useNewURLParser:true,useUnifiedTopology:true});
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todoapp', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todoDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
