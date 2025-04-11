@@ -5,8 +5,8 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 
 const app = express();
-const port = process.env.PORT || 5000;
-const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/todoDB';
+const port = 5000;
+//const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/todoDB';
 const saltRounds = 10; //o número de vezes que o algoritmo de criptografia será aplicado sobre a senha
 
 /*
@@ -20,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 //mongoose.connect(DB_URI);//, {useNewURLParser:true,useUnifiedTopology:true});
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todoDB', {
+mongoose.connect('mongodb://localhost:27017/todoDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
