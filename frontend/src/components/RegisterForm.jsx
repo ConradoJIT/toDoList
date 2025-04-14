@@ -33,7 +33,7 @@ function RegisterForm() {
 
     if (valido) {
       try {
-        const response = await api.post("/Usuarios", {
+        const response = await api.post("/Usuarios/registro", {
           nome,
           email,
           senha,

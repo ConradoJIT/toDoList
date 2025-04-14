@@ -1,14 +1,31 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../api";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Senha:", senha);
+    try {
+      const response = await api.post("/Usuarios/logging", { email, senha });
+
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+
+      navigate("/");
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Erro ao fazer login");
+      }
+    }
   };
 
   return (
@@ -49,6 +66,8 @@ function LoginForm() {
       >
         Entrar
       </button>
+      {/* Mensagem de erro */}
+      {erro && <p className="text-red-500 text-sm text-center">{erro}</p>}
 
       <p className="text-sm text-center mt-2">
         Não tem uma conta?{" "}
