@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { v4 } from "uuid";
+import api from "../api";
 
 function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ function RegisterForm() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let valido = true;
 
@@ -32,26 +32,24 @@ function RegisterForm() {
     }
 
     if (valido) {
-      const user = {
-        nome,
-        email,
-        senha,
-        id: v4(),
-      };
+      try {
+        const response = await api.post("/Usuarios", {
+          nome,
+          email,
+          senha,
+        });
 
-      const saveUsers = localStorage.getItem("users");
-
-      const usersList = saveUsers ? JSON.parse(saveUsers) : [];
-
-      usersList.push(user);
-
-      localStorage.setItem("users", JSON.stringify(usersList));
-
-      console.log("Usuário salvo:", user);
-      navigate("/");
-      setNome("");
-      setEmail("");
-      setSenha("");
+        console.log("Usuário cadastrado:", response.data);
+        navigate("/login");
+        setNome("");
+        setEmail("");
+        setSenha("");
+      } catch (error) {
+        console.error(
+          "Erro ao cadastrar usuário:",
+          error.response?.data || error.message
+        );
+      }
     }
   };
 
@@ -140,4 +138,5 @@ function RegisterForm() {
     </form>
   );
 }
+
 export default RegisterForm;
