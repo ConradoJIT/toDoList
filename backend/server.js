@@ -59,8 +59,13 @@ app.get('/Usuarios/', async(req,res) =>
     res.json(usuarios);
 });
 
-app.post('/Usuarios/', async(req,res)=>
+app.post('/Usuarios/registro', async(req,res)=>
 {
+    const {nome,email,_} = await Usuarios.findOne({email});
+    if (email)
+        return res.status(401).json({message:'Usuário já existe encontrado.'});
+    if (nome)
+        return res.status(401).json({message:'Nickname já existe.'});
     const novoUsuario = new Usuarios({
         nome: req.body.name,
         email: req.body.email,
@@ -68,6 +73,32 @@ app.post('/Usuarios/', async(req,res)=>
     });
     await novoUsuario.save();
     res.json(novoUsuario);
+});
+
+
+app.post('/Usuarios/logging', async(req,res) =>
+{
+    const {email, senha} = req.body;
+    const usuario = await Usuarios.findOne({email});
+    
+    if (!usuario)
+        return res.status(401).json({message:'Usuário não encontrado'});
+    
+    const isPwdCorrect = await bcrypt.compare(senha, usuario.senha);
+    if (!isPwdCorrect)
+        return res.status(401).json({message:'Senha inválida'});
+    
+    const token = jwt.sign
+    (
+        {
+            _id: user._id, //talvez seja necessário mudar esse "_id" para "id" para não dar conflito no front
+            nome: user.nome,
+            email: user.email
+        },
+        secretNumber,
+        {expiresIn:'12h'}
+    );
+    res.json({token});
 });
 
 app.put('/Usuarios/:id', async(req,res)=>
