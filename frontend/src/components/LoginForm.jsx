@@ -5,25 +5,39 @@ import api from "../api";
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [emailErro, setEmailErro] = useState("");
+  const [senhaErro, setSenhaErro] = useState("");
+
   const [erro] = useState("");
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await api.post("/Usuarios/logging", { email, senha });
+    let valido = true;
 
-      const { token } = response.data;
+    if (senha.length < 6) {
+      setSenhaErro("A senha deve ter no mínimo 6 caracteres.");
+      valido = false;
+    } else {
+      setSenhaErro("");
+    }
 
-      localStorage.setItem("token", token);
+    if (valido) {
+      try {
+        const response = await api.post("/Usuarios/logging", { email, senha });
 
-      navigate("/");
-    } catch (error) {
-      if (error.response && error.response.data.message) {
-        alert(error.response.data.message);
-      } else {
-        alert("Erro ao fazer login");
+        const { token } = response.data;
+
+        localStorage.setItem("token", token);
+
+        navigate("/");
+      } catch (error) {
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message);
+        } else {
+          alert("Erro ao fazer login");
+        }
       }
     }
   };
@@ -42,8 +56,14 @@ function LoginForm() {
           className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onInvalid={(e) => {
+            e.preventDefault();
+            setEmailErro("Por favor, insira um email válido.");
+          }}
+          onInput={() => setEmailErro("")}
           required
         />
+        {emailErro && <p className="text-red-500 text-sm">{emailErro}</p>}
       </div>
 
       <div className="flex flex-col">
@@ -56,8 +76,8 @@ function LoginForm() {
           className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-500"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          required
         />
+        {senhaErro && <p className="text-red-500 text-sm">{senhaErro}</p>}
       </div>
 
       <button
