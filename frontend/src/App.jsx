@@ -1,33 +1,23 @@
 import { useEffect, useState } from "react";
 import AddTask from "./components/AddTask";
 import Tasks from "./components/Tasks";
-import { v4 } from "uuid";
-import axios from 'axios';//biblioteca para comunicar o front com o back
+// import { v4 } from "uuid";
+import axios from "axios"; //biblioteca para comunicar o front com o back
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
-    deadline: ''
-    //priority: undefined
-    //email_user: undefined,
-  });
+  const email_user = localStorage.getItem("email");
 
   //pegar do banco
-  useEffect(()=>
-  {
+  useEffect(() => {
     pegarTarefas();
-  },[]);
-
+  }, []);
 
   async function onTaskClick(taskId) {
-    const updatedTasks = tasks.map((task) =>
-    {
-      if (task.id === taskId)
-      {
-        const updatedTask =  { ...task, isCompleted: !task.isCompleted };
-        updateTodo(taskId, {isCompleted:updatedTask.isCompleted});//atualização no back
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        const updatedTask = { ...task, isCompleted: !task.isCompleted };
+        updateTodo(taskId, { isCompleted: updatedTask.isCompleted }); //atualização no back
         return updatedTask;
       }
       return task;
@@ -42,45 +32,47 @@ function App() {
   }
 
   function onAddTaskSubmit(title, description, deadline) {
-    addTarefa(title, description, deadline);
+    addTarefa(title, description, deadline, email_user);
   }
-    
+
   //comunicação com o backend
-  const enderecoBD = 'http://localhost:5000'
+  const enderecoBD = "http://localhost:5000";
 
+  //PRECISA ADICIONAR FILTRO POR USER_EMAIL
   const pegarTarefas = async () => {
-    const response = await axios.get(`${enderecoBD}/Tarefas`) //endereço do banco de 
-    const tasksWithNormalId = response.data.map(_task => ({... _task, id:_task._id})); //quando eu pego do banco o "id" se chama "_id", eu tenha eu tenho que mudar o nome desse atributo
+    const response = await axios.get(`${enderecoBD}/Tarefas`); //endereço do banco de
+    const tasksWithNormalId = response.data.map((_task) => ({
+      ..._task,
+      id: _task._id,
+    })); //quando eu pego do banco o "id" se chama "_id", eu tenha eu tenho que mudar o nome desse atributo
     setTasks(tasksWithNormalId);
-  }
+  };
 
-  const addTarefa = async (title, description, deadline) => {
+  const addTarefa = async (title, description, deadline, email_user) => {
     try {
       const response = await axios.post(`${enderecoBD}/Tarefas`, {
         title,
         description,
         deadline,
-        isCompleted: false
+        email_user,
+        isCompleted: false,
       });
-      const taskWithNormalId = {...response.data, id:response.data._id};//normalização do id
+      const taskWithNormalId = { ...response.data, id: response.data._id }; //normalização do id
       setTasks([...tasks, taskWithNormalId]);
     } catch (error) {
       console.error("Erro ao adicionar tarefa:", error);
     }
   };
-  
-  const updateTodo = async (id, atributosAtualizacao) =>{
-    try
-    {
+
+  const updateTodo = async (id, atributosAtualizacao) => {
+    try {
       await axios.put(`${enderecoBD}/Tarefas/${id}`, atributosAtualizacao);
-    }
-    catch (error)
-    {
+    } catch (error) {
       console.error("Falha ao atualizar:", error);
     }
   };
 
-  const deleteTask = async(id) => {
+  const deleteTask = async (id) => {
     await axios.delete(`${enderecoBD}/Tarefas/${id}`);
     pegarTarefas(); //atualização da lista
   };
