@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import AddTask from "./components/AddTask";
 import Tasks from "./components/Tasks";
-// import { v4 } from "uuid";
-import axios from "axios"; //biblioteca para comunicar o front com o back
+import api from "./api";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -35,12 +34,9 @@ function App() {
     addTarefa(title, description, deadline, email_user);
   }
 
-  //comunicação com o backend
-  const enderecoBD = "http://localhost:5000";
-
   //PRECISA ADICIONAR FILTRO POR USER_EMAIL
   const pegarTarefas = async () => {
-    const response = await axios.get(`${enderecoBD}/Tarefas`); //endereço do banco de
+    const response = await api.get("/Tarefas");
     const tasksWithNormalId = response.data.map((_task) => ({
       ..._task,
       id: _task._id,
@@ -50,7 +46,7 @@ function App() {
 
   const addTarefa = async (title, description, deadline, email_user) => {
     try {
-      const response = await axios.post(`${enderecoBD}/Tarefas`, {
+      const response = await api.post("Tarefas", {
         title,
         description,
         deadline,
@@ -66,18 +62,16 @@ function App() {
 
   const updateTodo = async (id, atributosAtualizacao) => {
     try {
-      await axios.put(`${enderecoBD}/Tarefas/${id}`, atributosAtualizacao);
+      await api.put(`/Tarefas/${id}`, atributosAtualizacao);
     } catch (error) {
       console.error("Falha ao atualizar:", error);
     }
   };
 
   const deleteTask = async (id) => {
-    await axios.delete(`${enderecoBD}/Tarefas/${id}`);
-    pegarTarefas(); //atualização da lista
+    await api.delete(`/Tarefas/${id}`);
+    pegarTarefas();
   };
-
-  //fim da comunicação com o backend
 
   return (
     <div className="h-screen w-screen bg-slate-500 flex items-center justify-center p-6">
