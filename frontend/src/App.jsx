@@ -44,25 +44,29 @@ function App() {
   //PRECISA ADICIONAR FILTRO POR USER_EMAIL
   const pegarTarefas = async () => {
     const response = await api.get("/Tarefas", config);
+    console.log(response);
     const tasksWithNormalId = response.data.map((_task) => ({
       ..._task,
       id: _task._id,
     })); //quando eu pego do banco o "id" se chama "_id", eu tenha eu tenho que mudar o nome desse atributo
     setTasks(tasksWithNormalId);
+    console.log(tasksWithNormalId);
   };
 
   const addTarefa = async (title, description, deadline) => {
     try {
       const response = await api.post(
-        "Tarefas",
+        "/Tarefas",
         {
           title,
           description,
           deadline,
           isCompleted: false,
+          id_usuario: localStorage.getItem("token"),
         },
         config
       );
+      console.log(response);
       const taskWithNormalId = { ...response.data, id: response.data._id }; //normalização do id
       setTasks([...tasks, taskWithNormalId]);
     } catch (error) {
