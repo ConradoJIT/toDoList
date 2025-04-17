@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const req = require('express/lib/request.js');
 
 const app = express();
 const port = 5000;
@@ -22,7 +23,6 @@ mongoose.connect('mongodb://localhost:27017/todoDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
 
 const connection = mongoose.connection;
 
@@ -44,15 +44,16 @@ const Tarefas = mongoose.model('Tarefas',{
     description: String,
     deadline: Date,
     //priority: Number,
-    isCompleted: Boolean
+    isCompleted: Boolean,
     //Chave estrangeira
-    //email_usuario: {
-    //    type: mongoose.Schema.Types.ObjectId,
-    //    ref: 'Usuarios'
-    //}    
+    id_usuario: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuarios'
+    }    
 });
 
 //CRUD usuário (só vai funcionar quando o login tiver implementado)
+
 app.get('/Usuarios/', async(req,res) =>
 {
     const usuarios = await Usuarios.find();
@@ -108,14 +109,19 @@ app.put('/Usuarios/:id', async(req,res)=>
     try
     {
         const usuario = await Usuarios.findById(req.params.id);
-        if (req.params.email !== undefined && req.params.email != ''){
-            usuario.email = req.body.email;
+        if (!usuario)
+            return res.status(404).json({message: 'O usuário não existe'});
+        
+        const {nome, email, senha} = req.body;
+
+        if (email !== undefined && email != ''){
+            usuario.email = email;
         }
-        if (req.params.nome !== undefined && req.params.nome != ''){
-            usuario.nome = req.body.nome;
+        if (nome !== undefined && nome != ''){
+            usuario.nome = nome;
         }
-        if (req.params.senha !== undefined && req.params.nome != ''){
-            usuario.senha = req.body.senha;
+        if (senha !== undefined && senha.length >=6){
+            usuario.senha = await bcrypt.hash(senha, saltRounds);
         }
         await usuario.save();
         res.json(usuario);
@@ -134,24 +140,45 @@ app.delete('/Usuarios/:id', async(req,res) => {
 });
 
 //CRUD tarefas
-
 app.get('/Tarefas', async (req, res) => {
-    const tarefas = await Tarefas.find();
-    res.json(tarefas)
+    const token = req.headers.authorization?.split(" ")[1];
+    if(!token)
+        return res.status(401).json({message: 'O token não foi fornecido'});
+    try
+    {
+        const tokenDecoded = jwt.verify(token, secretNumber);
+        const tarefasUsuario = await Tarefas.find({id_usuario:tokenDecoded._id});
+        res.json(tarefasUsuario);
+    }
+    catch (err)
+    {
+        res.status(401).json({message:'O token é inválido'})
+    }
 });
 
-app.post('/Tarefas', async (req,res)=>{
-    const novaTarefa = new Tarefas({
-        title: req.body.title,
-        description: req.body.description,
-        deadline: req.body.deadline,
-        //email_usuario: req.body.email_usuario,
-        //priority: req.body.priority,
-        isCompleted: req.body.isCompleted
-    });
-    await novaTarefa.save();
-    res.json(novaTarefa);
+app.post('/Tarefas', async(req,res)=>{
+    const token = req.headers.authorization?.split(" ")[1];
+    if(!token)
+        return res.status(401).json({message: 'O token não foi fornecido'});
+    try
+    {
+        const tokenDecoded = jwt.verify(token, secretNumber);
+        const novaTarefa = new Tarefas({
+            title: req.body.title,
+            description: req.body.description,
+            deadline: req.body.deadline,
+            isCompleted: req.body.isCompleted,
+            id_usuario: tokenDecoded.id_usuario            
+        });
+        await novaTarefa.save();
+        res.json(novaTarefa);
+    } 
+    catch (err)
+    {
+        return res.status(401).json({message: 'O token é inválido'});
+    }
 });
+
 
 app.put('/Tarefas/:id', async (req,res)=>{
     const tarefa = await Tarefas.findById(req.params.id);
