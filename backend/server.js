@@ -53,29 +53,30 @@ const Tarefas = mongoose.model('Tarefas',{
 });
 
 //CRUD usuário (só vai funcionar quando o login tiver implementado)
-/*
 app.get('/Usuarios/', async(req,res) =>
 {
     const usuarios = await Usuarios.find();
     res.json(usuarios);
 });
 
-app.post('/Usuarios/registro', async(req,res)=>
-{
-    const {nome,email,_} = await Usuarios.findOne({email});
-    if (email)
-        return res.status(401).json({message:'Usuário já existe encontrado.'});
-    if (nome)
-        return res.status(401).json({message:'Nickname já existe.'});
+app.post('/Usuarios/registro', async (req, res) => {
+    const usuarioExistente = await Usuarios.findOne({ email: req.body.email });
+
+    if (usuarioExistente) {
+        return res.status(401).json({ message: 'Usuário já existe encontrado.' });
+    }
+
     const novoUsuario = new Usuarios({
         nome: req.body.name,
         email: req.body.email,
-        senha: await bcrypt.hash(req.body.senha,saltRounds) //criptografa a senha
+        senha: await bcrypt.hash(req.body.senha, saltRounds)
     });
+
     await novoUsuario.save();
     res.json(novoUsuario);
 });
 
+const secretNumber = "f97f28619e5cfdd7432c7a09ad43adebd025d0d34bd285169a791509cdfa77db5af46c485c3afc5ad1489fac87c9da8228e2801d537a9d65cb6705a323acdcc0"
 
 app.post('/Usuarios/logging', async(req,res) =>
 {
@@ -92,9 +93,9 @@ app.post('/Usuarios/logging', async(req,res) =>
     const token = jwt.sign
     (
         {
-            _id: user._id, //talvez seja necessário mudar esse "_id" para "id" para não dar conflito no front
-            nome: user.nome,
-            email: user.email
+            _id: usuario._id, //talvez seja necessário mudar esse "_id" para "id" para não dar conflito no front
+            nome: usuario.nome,
+            email: usuario.email
         },
         secretNumber,
         {expiresIn:'12h'}
@@ -131,7 +132,7 @@ app.delete('/Usuarios/:id', async(req,res) => {
         return res.status(404).json({error:'Usuário não encontrado'});
     res.json({message: 'Usuário deletado com sucesso'});
 });
-*/
+
 //CRUD tarefas
 
 app.get('/Tarefas', async (req, res) => {
