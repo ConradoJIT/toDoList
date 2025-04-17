@@ -5,7 +5,13 @@ import api from "./api";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const email_user = localStorage.getItem("email");
+  //const email_user = localStorage.getItem("email");
+  const token = localStorage.getItem("token")
+  const config = {
+    headers:{
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   //pegar do banco
   useEffect(() => {
@@ -16,7 +22,7 @@ function App() {
     const updatedTasks = tasks.map((task) => {
       if (task.id === taskId) {
         const updatedTask = { ...task, isCompleted: !task.isCompleted };
-        updateTodo(taskId, { isCompleted: updatedTask.isCompleted }); //atualização no back
+        updateTodo(taskId, { isCompleted: updatedTask.isCompleted },config); //atualização no back
         return updatedTask;
       }
       return task;
@@ -31,12 +37,12 @@ function App() {
   }
 
   function onAddTaskSubmit(title, description, deadline) {
-    addTarefa(title, description, deadline, email_user);
+    addTarefa(title, description, deadline);
   }
 
   //PRECISA ADICIONAR FILTRO POR USER_EMAIL
   const pegarTarefas = async () => {
-    const response = await api.get("/Tarefas");
+    const response = await api.get("/Tarefas", config);
     const tasksWithNormalId = response.data.map((_task) => ({
       ..._task,
       id: _task._id,
@@ -44,15 +50,14 @@ function App() {
     setTasks(tasksWithNormalId);
   };
 
-  const addTarefa = async (title, description, deadline, email_user) => {
+  const addTarefa = async (title, description, deadline) => {
     try {
       const response = await api.post("Tarefas", {
         title,
         description,
         deadline,
-        email_user,
         isCompleted: false,
-      });
+      },config);
       const taskWithNormalId = { ...response.data, id: response.data._id }; //normalização do id
       setTasks([...tasks, taskWithNormalId]);
     } catch (error) {
@@ -60,9 +65,9 @@ function App() {
     }
   };
 
-  const updateTodo = async (id, atributosAtualizacao) => {
+  const updateTodo = async (id, atributosAtualizacao, config) => {
     try {
-      await api.put(`/Tarefas/${id}`, atributosAtualizacao);
+      await api.put(`/Tarefas/${id}`, atributosAtualizacao, config);
     } catch (error) {
       console.error("Falha ao atualizar:", error);
     }
