@@ -140,7 +140,7 @@ app.get("/Tarefas", async (req, res) => {
   try {
     const tokenDecoded = jwt.verify(token, secretNumber);
     const tarefasUsuario = await Tarefas.find({
-      id_usuario: tokenDecoded.id_usuario,
+      id_usuario: tokenDecoded._id, // <- alterei aqui
     });
     res.json(tarefasUsuario);
   } catch (err) {
@@ -159,7 +159,7 @@ app.post("/Tarefas", async (req, res) => {
       description: req.body.description,
       deadline: req.body.deadline,
       isCompleted: req.body.isCompleted,
-      id_usuario: tokenDecoded.id_usuario,
+      id_usuario: tokenDecoded._id,
     });
     await novaTarefa.save();
     res.json(novaTarefa);
